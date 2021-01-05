@@ -1,0 +1,3 @@
+/home/maltenzo/CLionProjects/emulador/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/maltenzo/CLionProjects/emulador/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/maltenzo/CLionProjects/emulador/cmake-build-debug/CMakeFiles/emulador.dir

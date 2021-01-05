@@ -1,0 +1,1 @@
+/usr/bin/cc -g   CMakeFiles/emulador.dir/main.c.o CMakeFiles/emulador.dir/hardware/cpu/cpu_reg.c.o CMakeFiles/emulador.dir/hardware/cpu/cpu.c.o CMakeFiles/emulador.dir/hardware/GPU.c.o  -o emulador 
