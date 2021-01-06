@@ -232,7 +232,7 @@ mov rbp, rsp
 
 mov [rdi + 8], dl
 shr dx, 8
-mov [rdi + offset_registros_H], dl
+mov [rdi], dl
 
 
 pop rbp

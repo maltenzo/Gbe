@@ -12,15 +12,15 @@ Memory_t* mem_pointer(){
 }
 int main() {
     cpu_ = new_cpu();
+    uint8_t number= 0xAB;
     //printf("%x\n", cpu_->reg.H);
-    //write_mem(0xABCD, number);
-    //cpu_->reg.A = 0x0F;
-    //cpu_->reg.H = 0xAB;
-    //cpu_->reg.L = 0xCD;
-    //uint16_t number= 0xFFFF;
-    BIT_U3_HL(0x00);
-    printf("%x\n", cpu_->reg.F);
-    //printf("%x\n", cpu_->reg.L);
+    write_mem(0xAB00, number);
+    //cpu_->reg.A = 0xFF;
+    cpu_->reg.H = 0xAB;
+    cpu_->reg.L = 0x00;
+    printf("%x\n", read_mem(GET_HL()));
+    SWAP_HL();
+    printf("%x\n", read_mem(GET_HL()));
     //printf("%p\n", GET_HL());
     del_cpu();
 

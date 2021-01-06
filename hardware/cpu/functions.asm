@@ -29,8 +29,12 @@ extern GET_HL
 extern SET_HL
 extern GET_16
 extern SET_16
-global SetFlag:
+extern write_mem
+extern read_mem
 
+
+
+global SetFlag:
 ;rdi = flag (de las definidas arriba)
 ;rsi = bool para ver si prendo la flag o la apago.
 SetFlag:
@@ -649,6 +653,347 @@ INC_HL:
   pop rbp
   ret
 
+global LD_R8_N8
+LD_R8_N8:
+  push rbp
+  mov rbp, rsp
+  mov [rdi], sil
+  pop rbp
+  ret
+
+global LD_R8_R8
+LD_R8_R8:
+    push rbp
+    mov rbp, rsp
+    mov [rdi], sil
+    pop rbp
+    ret
+
+global LD_R16_N16
+LD_R16_N16:
+  push rbp
+  mov rbp, rsp
+
+  call SET_16
+
+  pop rbp
+  ret
+
+global LD_HL_N8
+LD_HL_N8:
+    push rbp
+    mov rbp, rsp
+    push r12
+    push r13
+
+    xor r12, r12
+    xor r13, r13
+
+    mov r13, rdi
+    call GET_HL
+    mov rdi, rax
+    mov rsi, r13
+
+    call write_mem
+
+    pop r13
+    pop r12
+    pop rbp
+    ret
+
+global LD_HL_R8
+LD_HL_R8:
+  push rbp
+  mov rbp, rsp
+  push r12
+  push r13
+
+  xor r12, r12
+  xor r13, r13
+
+  mov r13, rdi
+  call GET_HL
+  mov rdi, rax
+  mov rsi, r13
+
+  call write_mem
+
+  pop r13
+  pop r12
+  pop rbp
+  ret
+
+global LD_R8_HL
+LD_R8_HL:
+  push rbp
+  mov rbp, rsp
+  push r12
+  push r13
+  mov r12, rdi
+
+  call GET_HL
+  mov rdi, rax
+  call read_mem
+
+  mov [r12], rax
+  pop r13
+  pop r12
+  pop rbp
+  ret
+
+global LD_R16_A
+LD_R16_A:
+  push rbp
+  mov rbp, rsp
+  push r12
+  push r13
+
+  mov r12, rdi
+
+  call cpu_pointer
+  mov sil, [rax + offset_registros_A]
+  mov rdi, r12
+  call write_mem
+
+  pop r13
+  pop r12
+  pop rbp
+  ret
+
+global LD_N16_A
+LD_N16_A:
+  push rbp
+  mov rbp, rsp
+  push r12
+  push r13
+
+  mov r12, rdi
+
+  call cpu_pointer
+  mov sil, [rax + offset_registros_A]
+  mov rdi, r12
+  call write_mem
+
+  pop r13
+  pop r12
+  pop rbp
+  ret
+
+global LDH_N16_A
+LDH_N16_A:
+  push rbp
+  mov rbp, rsp
+  push r12
+  push r13
+
+  mov r12, rdi
+
+  call cpu_pointer
+  mov sil, [rax + offset_registros_A]
+  mov rdi, r12
+  add rdi, 0xFF00
+  call write_mem
+
+  pop r13
+  pop r12
+  pop rbp
+  ret
+
+global LDH_C_A
+LDH_C_A:
+  push rbp
+  mov rbp, rsp
+  call cpu_pointer
+  mov rdi, [rax + offset_registros_C]
+  add rdi, 0xFF00
+  mov rsi, [rax+offset_registros_A]
+  call write_mem
+  pop rbp
+  ret
+
+global LD_A_R16
+LD_A_R16:
+  push rbp
+  mov rbp, rsp
+  push r12
+  push r13
+
+  call read_mem
+  mov r12, rax
+
+  call cpu_pointer
+  mov [rax + offset_registros_A], r12b
+
+  pop r13
+  pop r12
+  pop rbp
+  ret
+
+global LD_A_N16
+LD_A_N16:
+  push rbp
+  mov rbp, rsp
+  push r12
+  push r13
+
+  call read_mem
+  mov r12, rax
+
+  call cpu_pointer
+  mov [rax + offset_registros_A], r12b
+
+  pop r13
+  pop r12
+  pop rbp
+  ret
+
+global LDH_A_N16
+LDH_A_N16:
+  push rbp
+  mov rbp, rsp
+  push r12
+  push r13
+
+  add rdi, 0xFF00
+  call read_mem
+  mov r12, rax
+
+  call cpu_pointer
+  mov [rax + offset_registros_A], r12b
+
+  pop r13
+  pop r12
+  pop rbp
+  ret
+
+global LDH_A_C
+LDH_A_C:
+  push rbp
+  mov rbp, rsp
+  push r12
+  push r13
+
+  call cpu_pointer
+  mov r12, rax
+  mov di, 0xFF00
+  mov sil, [r12 + offset_registros_C]
+  shl si, 8
+  shr si, 8
+  add di, si
+
+  call read_mem
+  mov [r12 + offset_registros_A], al
+
+  pop r13
+  pop r12
+  pop rbp
+  ret
+
+global LD_HLI_A
+LD_HLI_A:
+  push rbp
+  mov rbp, rsp
+  push r12
+  push r13
+
+  xor r12, r12
+  xor r13, r13
+
+  call GET_HL
+  mov r12, rax
+
+  call cpu_pointer
+
+  mov rdi, r12
+  mov rsi, [rax + offset_registros_A]
+  call write_mem
+
+  call INC_HL
+
+  pop r13
+  pop r12
+  pop rbp
+  ret
+
+global LD_HLD_A
+LD_HLD_A:
+  push rbp
+  mov rbp, rsp
+  push r12
+  push r13
+
+  xor r12, r12
+  xor r13, r13
+
+  call GET_HL
+  mov r12, rax
+
+  call cpu_pointer
+
+  mov rdi, r12
+  mov rsi, [rax + offset_registros_A]
+  call write_mem
+
+  call DEC_HL
+
+  pop r13
+  pop r12
+  pop rbp
+  ret
+
+global LD_A_HLI
+LD_A_HLI:
+    push rbp
+    mov rbp, rsp
+    push r12
+    push r13
+
+    xor r12, r12
+    xor r13, r13
+
+    call GET_HL
+    mov rdi, rax
+    call read_mem
+
+    mov r12, rax
+    call cpu_pointer
+
+    mov [rax + offset_registros_A], r12b
+
+    call INC_HL
+
+    pop r13
+    pop r12
+    pop rbp
+    ret
+
+global LD_A_HLD
+LD_A_HLD:
+    push rbp
+    mov rbp, rsp
+    push r12
+    push r13
+
+    xor r12, r12
+    xor r13, r13
+
+    call GET_HL
+    mov rdi, rax
+    call read_mem
+
+    mov r12, rax
+    call cpu_pointer
+
+    mov [rax + offset_registros_A], r12b
+
+    call DEC_HL
+
+    pop r13
+    pop r12
+    pop rbp
+    ret
+
+
 global OR
 OR:
   push rbp
@@ -732,6 +1077,42 @@ OR_A_N8:
     pop rbp
     ret
 
+global RES_U3_R8
+RES_U3_R8:
+push rbp
+mov rbp, rsp
+
+BTR [rdi], rsi
+
+pop rbp
+ret
+
+global RES_U3_HL
+RES_U3_HL:
+push rbp
+mov rbp, rsp
+push r12
+push r13
+xor r12, r12
+xor r13, r13
+
+mov r12b, dil
+
+call GET_HL
+mov r13, rax
+
+call cpu_pointer
+mov rax, [rax + offset_Memory]
+add ax, r13w
+
+btr [rax], r12
+
+pop r13
+pop r12
+pop rbp
+
+
+ret
 
 global SBC
 ;rdi = puntero al registro de 8 bits
@@ -832,6 +1213,47 @@ SBC_A_N8:
     pop rbp
     ret
 
+global SET_U3_R8
+SET_U3_R8:
+push rbp
+mov rbp, rsp
+
+mov rax, 1
+mov rcx, rsi
+shl rax, cl
+
+OR [rdi], rax
+
+pop rbp
+ret
+
+global SET_U3_HL
+SET_U3_HL:
+push rbp
+mov rbp, rsp
+push r12
+push r13
+
+mov r12, rdi
+call GET_HL
+mov r13, rax
+
+mov rax, 1
+mov cl, r12b
+shl rax, cl
+mov r12, rax
+
+call cpu_pointer
+mov rax, [rax+offset_Memory]
+add ax, r13w
+OR [rax],r12w
+
+pop r13
+pop r12
+pop rbp
+ret
+
+global SUB
 SUB:
   push rbp
   mov rbp, rsp
@@ -927,6 +1349,61 @@ SUB_A_N8:
     pop r12
     pop rbp
     ret
+
+global SWAP_R8
+SWAP_R8:
+push rbp
+mov rbp, rsp
+push r12
+push r13
+
+xor r12, r12
+xor r13, r13
+
+mov r12b, [rdi]
+mov r13b, [rdi]
+
+shr r12b, 4
+shl r13b, 4
+or r12b, r13b
+mov [rdi], r12b
+
+pop r13
+pop r12
+pop rbp
+ret
+
+global SWAP_HL
+SWAP_HL:
+push rbp
+mov rbp, rsp
+push r12
+push r13
+
+xor r12, r12
+xor r13, r13
+
+call GET_HL
+mov r12w, ax
+
+call cpu_pointer
+mov rax, [rax+offset_Memory]
+ADD rax, r12
+
+mov dil, [rax]
+mov sil, dil
+
+shr dil, 4
+shl sil, 4
+or dil, sil
+
+mov [rax], dil
+
+
+pop r13
+pop r12
+pop rbp
+ret
 
 global XOR
 XOR:
